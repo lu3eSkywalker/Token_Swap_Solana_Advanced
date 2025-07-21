@@ -174,13 +174,17 @@ pub mod Simple_Token_Swap {
             .checked_sub(tokenAToSend)
             .ok_or(error!(TokenSwapError::CalculationError))?;
 
+        let tokenA_Swap_Fees = tokenAtoGive * 3 / 100;
+
+        let tokenA_With_Swap_Fees = tokenAtoGive - tokenA_Swap_Fees;
+
         require!(
-            tokenAtoGive <= token_a_quantity as u128,
+            tokenA_With_Swap_Fees <= token_a_quantity as u128,
             TokenSwapError::InsufficientTokenA
         );
 
         require!(
-            tokenAtoGive >= minExpectedOutput as u128,
+            tokenA_With_Swap_Fees >= minExpectedOutput as u128,
             TokenSwapError::SlippageExceeded
         );
 
@@ -194,7 +198,7 @@ pub mod Simple_Token_Swap {
         )?;
 
         // Convert to u64 before transferring
-        let tokenAtoGive: u64 = tokenAtoGive
+        let tokenA_With_Swap_Fees: u64 = tokenA_With_Swap_Fees
             .try_into()
             .map_err(|_| error!(TokenSwapError::CalculationError))?;
 
@@ -206,7 +210,7 @@ pub mod Simple_Token_Swap {
             &ctx.accounts.user_token_account_for_token_a,
             &ctx.accounts.token_program,
             ctx.bumps.vault_auth_a,
-            tokenAtoGive,
+            tokenA_With_Swap_Fees,
         )?;
 
         Ok(())
@@ -215,6 +219,8 @@ pub mod Simple_Token_Swap {
     pub fn swap_a_for_b(ctx: Context<TokenSwap>, amountOfTokenA: u64, minExpectedOutput: u64) -> Result<()> {
         let token_a_quantity = ctx.accounts.vault_token_a_account.amount;
         let token_b_quantity = ctx.accounts.vault_token_b_account.amount;
+
+        let swapFees = 0.3;
 
         let (x) = amm_calculation(token_a_quantity, token_b_quantity)?;
 
@@ -226,13 +232,17 @@ pub mod Simple_Token_Swap {
             .checked_sub(tokenBtoSend)
             .ok_or(error!(TokenSwapError::CalculationError))?;
 
+        let tokenB_Swap_Fees = tokenBtoGive * 3 / 100;
+
+        let tokenB_With_Swap_Fees = tokenBtoGive - tokenB_Swap_Fees;
+
         require!(
-            tokenBtoGive <= token_b_quantity as u128,
+            tokenB_With_Swap_Fees <= token_b_quantity as u128,
             TokenSwapError::InsufficientTokenB
         );
 
         require!(
-            tokenBtoGive >= minExpectedOutput as u128,
+            tokenB_With_Swap_Fees >= minExpectedOutput as u128,
             TokenSwapError::SlippageExceeded
         );
 
@@ -246,7 +256,7 @@ pub mod Simple_Token_Swap {
         )?;
 
         // Convert to u64 before transferring
-        let tokenBtoGive: u64 = tokenBtoGive
+        let tokenB_With_Swap_Fees: u64 = tokenB_With_Swap_Fees
             .try_into()
             .map_err(|_| error!(TokenSwapError::CalculationError))?;
 
@@ -259,7 +269,7 @@ pub mod Simple_Token_Swap {
             &ctx.accounts.user_token_account_for_token_b,
             &ctx.accounts.token_program,
             ctx.bumps.vault_auth_b,
-            tokenBtoGive,
+            tokenB_With_Swap_Fees,
         )?;
 
         Ok(())
