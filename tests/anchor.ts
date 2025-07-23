@@ -541,7 +541,7 @@ describe("Test", () => {
     const expectedOutput_With_Swap_Fees = expectedOutput.muln(1 - swapFees);
 
     const slippageMultiplier = 1 - userSlippageTolerancePercent;
-    
+
     const minExpectedOutput = expectedOutput_With_Swap_Fees.muln(slippageMultiplier * 1000).divn(10000);
 
     const txHash = await program.methods
@@ -565,5 +565,59 @@ describe("Test", () => {
 
     // Confirm Transaction
     await program.provider.connection.confirmTransaction(txHash);
+  });
+
+  it("Price Impact Calculation when swapping Token A for Token B", async () => {
+    const Token_A = await getAccount(program.provider.connection, vault_token_account_a);
+
+    const Token_B = await getAccount(program.provider.connection, vault_token_account_b);
+
+    const Token_A_Quantity = parseInt(Token_A.amount.toString(), 10);
+    const Token_B_Quantity = parseInt(Token_B.amount.toString(), 10);
+
+    const amount = 1_000_000_000;
+
+    const k = Token_A_Quantity * Token_B_Quantity;
+
+    const newReserveA = Token_A_Quantity + amount;
+    const newReserveB = k / newReserveA;
+    const outputB = Token_B_Quantity - newReserveB;
+
+    const swapFees = 0.003;
+    const outputBWithFees = outputB - (1 - swapFees);
+
+    const spotPrice = Token_B_Quantity / Token_A_Quantity;
+    const swapPrice = outputBWithFees / amount;
+
+    const priceImpactPercent = ((spotPrice - swapPrice) / spotPrice) * 100;
+
+    console.log("This is the price impact: ", priceImpactPercent);
+  });
+
+  it("Price Impact Calculation when swapping Token B for Token A", async () => {
+    const Token_A = await getAccount(program.provider.connection, vault_token_account_a);
+
+    const Token_B = await getAccount(program.provider.connection, vault_token_account_b);
+
+    const Token_A_Quantity = parseInt(Token_A.amount.toString(), 10);
+    const Token_B_Quantity = parseInt(Token_B.amount.toString(), 10);
+
+    const amount = 1_000_000_000;
+
+    const k = Token_A_Quantity * Token_B_Quantity;
+
+    const newReserveB = Token_B_Quantity + amount;
+    const newReserveA = k / newReserveB;
+    const outputA = Token_A_Quantity - newReserveA;
+
+    const swapFees = 0.003;
+    const outputAWithFees = outputA - (1 - swapFees);
+
+    const spotPrice = Token_A_Quantity / Token_B_Quantity;
+    const swapPrice = outputAWithFees / amount;
+
+    const priceImpactPercent = ((spotPrice - swapPrice) / spotPrice) * 100;
+
+    console.log("This is the price impact: ", priceImpactPercent);
   });
 });
