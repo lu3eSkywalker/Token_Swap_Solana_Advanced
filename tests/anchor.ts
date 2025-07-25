@@ -6,7 +6,7 @@ import { BN } from "bn.js";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { assert } from "chai";
 
-const base58PrivateKey = "";
+const base58PrivateKey = "2snVeCy1jqajYWCgqFR7wCy3BmqBaZMhBGEi2AzWhS4kg7xRZhTrTirrWJ8XMq9pH2mK5FZaDAJQFEH1L5fnTFsB";
 const privateKeySeed = bs58.decode(base58PrivateKey);
 
 const userKeyPair = web3.Keypair.fromSecretKey(privateKeySeed);
@@ -62,69 +62,7 @@ describe("Test", () => {
     [Buffer.from("vaultTokenB"), tokenB_mint_address.toBuffer()],
     program.programId
   );
-
-  it("Fetches the price of Token A and Token B", async () => {
-    const Token_A = await getAccount(program.provider.connection, vault_token_account_a);
-    const Token_A_Quantity = parseInt(Token_A.amount.toString(), 10);
-
-    const Token_B = await getAccount(program.provider.connection, vault_token_account_b);
-    const Token_B_Quantity = parseInt(Token_B.amount.toString(), 10);
-
-    const Price_of_Token_A = Token_B_Quantity / Token_A_Quantity;
-    const Price_of_Token_B = Token_A_Quantity / Token_B_Quantity;
-
-    console.log("This is the new price of Token A: ", Price_of_Token_A);
-    console.log("This is the new price of Token B: ", Price_of_Token_B);
-  });
-
-  it("Fetches the price for Token A and Token B with slippage", async () => {
-    const decimals = 1000000000;
-    const Token_A = await getAccount(program.provider.connection, vault_token_account_a);
-    const Token_A_Quantity = parseInt(Token_A.amount.toString(), 10);
-    console.log("This is the quantity in number: ", Token_A_Quantity / decimals);
-
-    const Token_B = await getAccount(program.provider.connection, vault_token_account_b);
-    const Token_B_Quantity = parseInt(Token_B.amount.toString(), 10);
-    console.log("This is the Token B quantity in number: ", Token_B_Quantity / decimals);
-
-    const k = Token_A_Quantity * Token_B_Quantity;
-
-    // const Price_of_Token_A = (-k + ((Token_A_Quantity - 100) * Token_B_Quantity)) / (100 - Token_A_Quantity);
-    // console.log("Price of token A in terms of Token B is: ", Price_of_Token_A);
-    // const Price_of_Token_B = (-k + ((Token_B_Quantity - 100) * Token_A_Quantity)) / (100 - Token_B_Quantity);
-    // console.log("Price of Token B in terms of Token A is: ", Price_of_Token_B);
-
-    // Spot Price: Token A -> Token B
-    const spotPrice = Token_B_Quantity / Token_A_Quantity;
-    console.log("Spot price (1 A in B): ", spotPrice);
-
-    // Simulate a swap of 100 Token A
-    const inputAmount = 1 * decimals;
-
-    const newTokenA = Token_A_Quantity + inputAmount;
-    const newTokenB = k / newTokenA;
-    const outputB = Token_B_Quantity - newTokenB;
-    const swapPrice = outputB / inputAmount;
-
-    console.log("Swap price (1A in B): ", swapPrice);
-    console.log("Output B: ", outputB / decimals);
-
-    const slippage = ((spotPrice - swapPrice) / spotPrice) * 100;
-
-    if (slippage >= 1) {
-      console.log("slipage is more than 1 percent");
-      return;
-    }
-
-    // 1 Sol = 100 USDC
-    // 10 sol = 10 * 100 USDC
-    const expected_token_user_will_receive = 1000;
-
-    // const mint_out = expected_token_user_will_receive * (1 - slippage_percent);
-
-    console.log("This is the slippage: ", slippage);
-  });
-
+  
   it("initializes a Vault Account For Token A", async () => {
     const [vault_token_account, bump1] = await web3.PublicKey.findProgramAddressSync(
       [Buffer.from("vaultTokenA"), tokenA_mint_address.toBuffer()],

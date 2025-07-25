@@ -152,7 +152,7 @@ describe("Test", () => {
     const [mint] = web3.PublicKey.findProgramAddressSync(
       [Buffer.from("mint")],
       program.programId
-    );
+  );
 
     const [authorityPDA] = web3.PublicKey.findProgramAddressSync(
       [Buffer.from("authority")],
