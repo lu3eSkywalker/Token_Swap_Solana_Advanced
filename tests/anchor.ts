@@ -6,7 +6,7 @@ import { BN } from "bn.js";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 import { assert } from "chai";
 
-const base58PrivateKey = "2snVeCy1jqajYWCgqFR7wCy3BmqBaZMhBGEi2AzWhS4kg7xRZhTrTirrWJ8XMq9pH2mK5FZaDAJQFEH1L5fnTFsB";
+const base58PrivateKey = "";
 const privateKeySeed = bs58.decode(base58PrivateKey);
 
 const userKeyPair = web3.Keypair.fromSecretKey(privateKeySeed);
